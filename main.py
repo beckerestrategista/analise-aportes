@@ -4,6 +4,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
+# A sua função de plotagem permanece a mesma, sem alterações.
 def plotar_compras_com_volume(ticker, google_sheet_public_url, fig, ax, janela_dias=365):
     try:
         df_negociacoes = pd.read_csv(google_sheet_public_url)
@@ -58,38 +59,71 @@ def plotar_compras_com_volume(ticker, google_sheet_public_url, fig, ax, janela_d
     ax.legend(loc='upper left', fancybox=True, labelspacing=1.2)
     ax.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-# --- Interface do App Streamlit ---
+
+# --- LÓGICA DE NAVEGAÇÃO E INTERFACE DO APP ---
+
 st.set_page_config(layout="wide")
-st.title('Meu Dashboard de Análise de Aportes 📈')
 
-# Campo para o usuário digitar o ticker
-ticker_input = st.text_input('Digite o código da Ação (ex: BBAS3, PETR4, ISAE4):', 'BBAS3').upper()
+# Inicializa a "memória" da sessão para saber em qual página estamos.
+if 'pagina_atual' not in st.session_state:
+    st.session_state.pagina_atual = 'home'
 
-# Campo para o usuário digitar o link para a planilha
-planillha_input = st.text_input('Digite o link da planilha: ', placeholder= 'Link da planilha')
-
-# Campo para o usuário digitar o tempo para análise
-janela_input = st.number_input(
-    'Digite a janela de tempo em dias que você quer analisar:',
-    min_value=1,
-    step=1,
-    format="%d",
-    value=365
-)
-# Botão para gerar a análise
-if st.button('Analisar Ativo'):
-    if ticker_input:
-        # Cria a figura e os eixos do Matplotlib
-        fig, ax = plt.subplots(figsize=(15, 8))
-        plt.style.use('seaborn-v0_8-darkgrid')
-        
-        # Chama a função para plotar os dados na figura
-        plotar_compras_com_volume(ticker_input, planillha_input, fig, ax, janela_input)
-        
-        # Exibe o gráfico no Streamlit
-        st.pyplot(fig)
+# Função para mudar para a página de análise
+def navegar_para_analise():
+    # Salva o link da planilha na memória antes de mudar de página
+    if st.session_state.url_input_field and "docs.google.com" in st.session_state.url_input_field:
+        st.session_state.link_da_planilha = st.session_state.url_input_field
+        st.session_state.pagina_atual = 'analise'
     else:
-        st.warning('Por favor, digite o código de um ativo.')
+        st.warning("Por favor, insira um link válido do Google Sheets.")
 
-st.sidebar.header('Sobre')
-st.sidebar.info('Este é um dashboard interativo para visualizar o histórico de aportes em ações, criado com Python e Streamlit.')
+# Função para voltar para a página inicial
+def navegar_para_home():
+    st.session_state.pagina_atual = 'home'
+
+# --- RENDERIZAÇÃO DA PÁGINA ---
+
+# PÁGINA 1: TELA INICIAL
+if st.session_state.pagina_atual == 'home':
+    st.title('Meu Dashboard de Análise de Aportes 📈')
+    st.header('Passo 1: Conecte sua Planilha')
+    
+    st.text_input(
+        'Insira o link PÚBLICO da sua planilha Google Sheets (formato .csv):',
+        key='url_input_field', # Chave para acessar o valor na memória
+        placeholder='https://docs.google.com/spreadsheets/d/e/seu-link-aqui/pub?output=csv'
+    )
+    
+    st.button('Avançar para Análise', on_click=navegar_para_analise)
+
+# PÁGINA 2: TELA DE ANÁLISE
+elif st.session_state.pagina_atual == 'analise':
+    st.title('Análise de Ativo Individual 📊')
+    st.info(f"Analisando dados da planilha: {st.session_state.link_da_planilha}")
+    st.header('Passo 2: Escolha o Ativo e a Janela de Tempo')
+
+    # Cria duas colunas para organizar os campos de input
+    col1, col2 = st.columns(2)
+
+    with col1:
+        ticker_input = st.text_input('Digite o código da Ação (ex: BBAS3, PETR4):', 'BBAS3').upper()
+    
+    with col2:
+        janela_input = st.number_input(
+            'Janela de tempo em dias:',
+            min_value=30, step=30, format="%d", value=365
+        )
+    
+    # Botão para gerar a análise
+    if st.button('Analisar Ativo'):
+        if ticker_input:
+            # Usa um spinner para dar um feedback visual enquanto os dados carregam
+            with st.spinner(f'Buscando dados de {ticker_input} e gerando o gráfico...'):
+                fig, ax = plt.subplots(figsize=(15, 8))
+                plt.style.use('seaborn-v0_8-darkgrid')
+                plotar_compras_com_volume(ticker_input, st.session_state.link_da_planilha, fig, ax, janela_input)
+                st.pyplot(fig)
+        else:
+            st.warning('Por favor, digite o código de um ativo.')
+            
+    st.button('Voltar e inserir outra planilhla', on_click=navegar_para_home)
