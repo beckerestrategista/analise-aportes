@@ -53,11 +53,11 @@ if 'pagina_atual' not in st.session_state:
   st.session_state.pagina_atual = 'home'
 
 def carregar_e_navegar():
-  url = st.session_state.url_input_field
-  if url and "docs.google.com" in url:
+  arquivo_carregado = st.session_state.file_uploader_widget
+  if arquivo_carregado:
     try:
       with st.spinner('Carregando e validando sua planilha...'):
-        df = pd.read_csv(url)
+        df = pd.read_excel(arquivo_carregado)
         coluna_ticker = 'Código de Negociação'
         df[coluna_ticker] = df[coluna_ticker].astype(str).str.strip().str.upper()
         df[coluna_ticker] = df[coluna_ticker].str.replace('F$', '', regex=True)
@@ -77,30 +77,33 @@ def navegar_para_home():
 # --- RENDERIZAÇÃO DAS PÁGINAS ---
 if st.session_state.pagina_atual == 'home':
   st.title('Meu Dashboard de Análise de Aportes 📈')
-  st.header('Passo 1: Conecte sua Planilha')
-  st.markdown("Insira o linkpublicado no formato **.csv** da sua planilha Google Sheets abaixo.")
+  st.header('Passo 1: Carregue sua Planilha')
+  st.markdown("Insira o arquivo de histórico de aportes no formato **.xlsx** obtido pelo Portal do Investidor da B3.")
   
-# --- GUIA PASSO A PASSO IMPLEMENTADO AQUI ---
-  with st.expander("Precisa de ajuda? Clique aqui para ver o passo a passo de como gerar o link."):
+# --- GUIA PASSO A PASSO APRIMORADO ---
+  with st.expander("Precisa de ajuda para obter o arquivo? Clique aqui para ver o passo a passo."):
         st.markdown("""
-        1.  **Acesse a Área do Investidor B3:** Faça o login no portal oficial: [https://www.investidor.b3.com.br](https://www.investidor.b3.com.br)
-        2.  **Vá para Extratos:** No menu lateral, clique na opção "Extratos".
-        3.  **Selecione "Negociação":** Dentro dos extratos, escolha a aba "Negociação".
-        4.  **Filtre o Período:** Selecione o intervalo de datas desejado. **Dica:** para uma análise completa, filtre desde o início dos seus investimentos.
-        5.  **Baixe a Planilha:** Clique no ícone de download para baixar o arquivo em formato Excel (`.xlsx`).
-        6.  **Importe para o Google Sheets:** Crie uma nova "Planilha Google" em branco e vá em **Arquivo > Importar**. Na aba "Upload", selecione o arquivo que você baixou da B3.
-        7.  **Publique na Web como CSV:**
-            - No menu da sua Planilha Google, vá em **Arquivo > Compartilhar > Publicar na web**.
-            - Na janela que abrir, na aba **Link**, garanta que **"Página inteira"** esteja selecionado.
-            - No segundo menu, escolha a opção **Valores separados por vírgula (.csv)**.
-            - Clique em **Publicar** e copie o link gerado.
-        8.  **Cole o Link:** O link que você acabou de copiar é o que deve ser inserido no campo abaixo.
+        1.  **🔑 Acesse o Portal do Investidor B3**
+            -   Faça seu login no site oficial: [https://www.investidor.b3.com.br](https://www.investidor.b3.com.br)
+
+        2.  **📜 Encontre seu Extrato de Negociações**
+            -   No menu lateral, navegue por **Extratos > Negociação**.
+
+        3.  **📅 Filtre o Período Completo**
+            -   Use os filtros para selecionar o intervalo de datas que deseja analisar.
+            -   *Dica: Para uma visão completa, filtre desde a data do seu primeiro investimento.*
+
+        4.  **📥 Baixe a Planilha de Negociações**
+            -   Clique no ícone de **Download** (uma seta para baixo) para baixar o arquivo em formato Excel (`.xlsx`).
+            -   Atente-se para baixar a planilha completa clicando em "Ver detalhe".
         """)
   
-  st.text_input(
-    'Link da Planilha:',
-    key='url_input_field',
-  )
+  st.file_uploader(
+        "**Arraste o arquivo da B3 para cá ou clique para procurar**",
+        type=['xlsx'],
+        key='file_uploader_widget',
+        label_visibility='visible' # Garante que o rótulo sempre apareça
+    )
   
   st.button('Carregar Planilha e Avançar', on_click=carregar_e_navegar, type="primary")
 
