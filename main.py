@@ -78,12 +78,28 @@ def navegar_para_home():
 if st.session_state.pagina_atual == 'home':
   st.title('Meu Dashboard de Análise de Aportes 📈')
   st.header('Passo 1: Conecte sua Planilha')
-  st.markdown("Insira o link **publicado no formato .csv** da sua planilha Google Sheets abaixo.")
+  st.markdown("Insira o linkpublicado no formato **.csv** da sua planilha Google Sheets abaixo.")
+  
+# --- GUIA PASSO A PASSO IMPLEMENTADO AQUI ---
+  with st.expander("Precisa de ajuda? Clique aqui para ver o passo a passo de como gerar o link."):
+        st.markdown("""
+        1.  **Acesse a Área do Investidor B3:** Faça o login no portal oficial: [https://www.investidor.b3.com.br](https://www.investidor.b3.com.br)
+        2.  **Vá para Extratos:** No menu lateral, clique na opção "Extratos".
+        3.  **Selecione "Negociação":** Dentro dos extratos, escolha a aba "Negociação".
+        4.  **Filtre o Período:** Selecione o intervalo de datas desejado. **Dica:** para uma análise completa, filtre desde o início dos seus investimentos.
+        5.  **Baixe a Planilha:** Clique no ícone de download para baixar o arquivo em formato Excel (`.xlsx`).
+        6.  **Importe para o Google Sheets:** Crie uma nova "Planilha Google" em branco e vá em **Arquivo > Importar**. Na aba "Upload", selecione o arquivo que você baixou da B3.
+        7.  **Publique na Web como CSV:**
+            - No menu da sua Planilha Google, vá em **Arquivo > Compartilhar > Publicar na web**.
+            - Na janela que abrir, na aba **Link**, garanta que **"Página inteira"** esteja selecionado.
+            - No segundo menu, escolha a opção **Valores separados por vírgula (.csv)**.
+            - Clique em **Publicar** e copie o link gerado.
+        8.  **Cole o Link:** O link que você acabou de copiar é o que deve ser inserido no campo abaixo.
+        """)
   
   st.text_input(
     'Link da Planilha:',
     key='url_input_field',
-    placeholder='https://docs.google.com/spreadsheets/d/e/seu-link-aqui/pub?output=csv'
   )
   
   st.button('Carregar Planilha e Avançar', on_click=carregar_e_navegar, type="primary")
