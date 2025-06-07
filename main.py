@@ -4,7 +4,6 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-# A função que já criamos. Nenhuma mudança necessária aqui dentro.
 def plotar_compras_com_volume(ticker, google_sheet_public_url, fig, ax, janela_dias=365):
     try:
         df_negociacoes = pd.read_csv(google_sheet_public_url)
@@ -56,19 +55,27 @@ def plotar_compras_com_volume(ticker, google_sheet_public_url, fig, ax, janela_d
     ax.set_title(f'Histórico de Cotações e Volume de Compras - {ticker_sa}', fontsize=16, weight='bold')
     ax.set_xlabel('Data', fontsize=12)
     ax.set_ylabel('Preço de Fechamento (R$)', fontsize=12)
-    ax.legend(title='Volume dos Aportes', loc='upper left', fancybox=True, labelspacing=1.2)
+    ax.legend(loc='upper left', fancybox=True, labelspacing=1.2)
     ax.grid(True, which='both', linestyle='--', linewidth=0.5)
 
 # --- Interface do App Streamlit ---
-st.set_page_config(layout="wide") # Deixa a página mais larga
+st.set_page_config(layout="wide")
 st.title('Meu Dashboard de Análise de Aportes 📈')
 
-# URL da planilha (pode ser um campo de texto se você quiser mudar)
-LINK_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTTlkKUxCrX4AXms8c-vw2kvFauDGAmp_RzFhtB8erG5jW86l0vAEXh9TkWPKtPwlgWLvrQ0F9nYLU/pub?output=csv'
-
 # Campo para o usuário digitar o ticker
-ticker_input = st.text_input('Digite o código da Ação (ex: BBAS3, PETR4, MGLU3):', 'BBAS3').upper()
+ticker_input = st.text_input('Digite o código da Ação (ex: BBAS3, PETR4, ISAE4):', 'BBAS3').upper()
 
+# Campo para o usuário digitar o link para a planilha
+planillha_input = st.text_input('Digite o link da planilha: ', placeholder= 'Link da planilha')
+
+# Campo para o usuário digitar o tempo para análise
+janela_input = st.number_input(
+    'Digite a janela de tempo em dias que você quer analisar:',
+    min_value=1,
+    step=1,
+    format="%d",
+    value=365
+)
 # Botão para gerar a análise
 if st.button('Analisar Ativo'):
     if ticker_input:
@@ -77,7 +84,7 @@ if st.button('Analisar Ativo'):
         plt.style.use('seaborn-v0_8-darkgrid')
         
         # Chama a função para plotar os dados na figura
-        plotar_compras_com_volume(ticker_input, LINK_PLANILHA, fig, ax)
+        plotar_compras_com_volume(ticker_input, planillha_input, fig, ax, janela_input)
         
         # Exibe o gráfico no Streamlit
         st.pyplot(fig)
