@@ -94,7 +94,7 @@ if st.session_state.pagina_atual == 'home':
             -   *Dica: Para uma visão completa, filtre desde a data do seu primeiro investimento.*
 
         4.  **📥 Baixe a Planilha de Negociações**
-            -   Clique no ícone de **Download** (uma seta para baixo) para baixar o arquivo em formato Excel (`.xlsx`).
+            -   Clique no ícone de **Download** (⬇️) para baixar o arquivo em formato Excel (`.xlsx`).
             -   Atente-se para baixar a planilha completa clicando em "Ver detalhe".
         """)
   
