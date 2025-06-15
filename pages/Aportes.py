@@ -2,17 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import locale
-
-# --- CONFIGURAÇÃO DO IDIOMA PARA PORTUGUÊS ---
-try:
-    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
-except:
-    try:
-        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil')
-    except:
-        st.warning("Não foi possível configurar o idioma para Português.")
+from datetime import timedelta
 
 # --- FUNÇÃO DE PLOTAGEM (AJUSTADA E ROBUSTA) ---
 def plotar_grafico_aportes(ticker, df_aportes_filtrado, fig, ax, janela_dias=365):
