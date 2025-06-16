@@ -1,11 +1,25 @@
+# Nome do Workflow
+name: Atualização Diária dos Dados
+
+# Gatilhos (Triggers)
+on:
+  # Executa conforme agendamento (cron)
+  schedule:
+    - cron: '0 13 * * *' # Todos os dias às 10h no horário de Brasília (UTC-3)
+  
+  # Permite a execução manual pela aba "Actions"
+  workflow_dispatch:
+
+# Definição dos Jobs (Tarefas)
 jobs:
   build-and-commit:
     runs-on: ubuntu-latest
     
-    # ADICIONE ESTAS DUAS LINHAS AQUI
+    # Permissões para o job poder escrever no repositório
     permissions:
       contents: write
 
+    # Passos a serem executados
     steps:
       - name: '1. Checkout do repositório'
         uses: actions/checkout@v4
